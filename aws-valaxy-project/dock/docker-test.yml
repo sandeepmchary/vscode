@@ -1,0 +1,33 @@
+- hosts: dock
+  become: yes
+  tasks:
+    - name: Update yum
+      package:
+        name: "*"
+        state: latest
+    - name: Install docker dependencies
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+    - name: Add Docker Repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+    - name: Install Docker CE
+      package:
+        name: docker-ce
+        state: present
+    - name: Add user to docker group
+      user:
+        name: centos
+        groups: docker
+        append: yes
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes                      
