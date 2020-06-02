@@ -1,0 +1,14 @@
+- hosts: localhost
+  become: yes
+  vars:
+    - user: sandeepmchary
+    - email: awssandeepchary@gmail.com
+  tasks:
+    - name: install git
+      package:
+        name: git
+        state: present
+    - name: Confgure git user name
+      command: git config --global user.name "{{ user }}"
+    - name: Configure git email
+      command: git config --global user.email "{{ email }}"

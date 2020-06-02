@@ -1,0 +1,140 @@
+Maven-setup
+ -------------------------
+ - hosts: localhost
+  connection: local
+  vars:
+    - maven_version: 3.6.3
+    - maven_url: http://www.apache.org/dist/maven/maven-{{maven_version.split('.')[0]}}/{{maven_version}}/binaries/apache-maven-{{maven_version}}-bin.tar.gz
+  become: yes
+  tasks:
+    - debug:
+        var: maven_url
+    - name: Checking if maven is installed or not
+      stat:
+        path: '/opt/apache-maven-{{ maven_version }}'
+      register: maven_installed
+    - name: Download the maven
+      unarchive:
+        src: "{{maven_url}}"
+        dest: /opt
+        remote_src: yes
+    - name: Remove old path configuration
+      file:
+        path: /etc/profile.d/maven.sh
+        state: absent
+    - name: Maven path Configuration
+      lineinfile:
+        dest: /etc/profile.d/maven.sh
+        line: '{{item.line}}'
+        state: present
+        create: yes
+      with_items:
+        - { line: 'M2_HOME=/opt/apache-maven-{{maven_version}}' }
+        - {line: 'PATH=$PATH:$M2_HOME/bin'}
+    - name: Cleaning up
+      file:
+        state: absent
+        path: /opt/apache-maven-{{maven_version}}-bin.tar.gz   
+
+ ------------------------
+ - logoff and login again
+ - manage jenkins --> available --> search for maven -->	
+Maven Integration
+Maven Invoker --> install without restart
+- manage jenkins --> Global Tool Configuration -->
+Maven
+    - Add Maven
+    - Name: maven
+    - MAVEN_HOME: /opt/apache-maven-3.6.3 (it comes with above the playbook)
+ ------------------------------------------------------------------------------------------------
+---          Class 10
+--- Create first maven job
+  - Jenkins
+  - my_first_maven_build(click on maven )
+  - Source Code Management - Git -	Repositories
+  - Build - Root POM - clen install package
+  - save 
+  - build now
+  - this is default workspace for jenkins
+  - /var/lib/jenkins/workspace/
+  --------------------------------------------------------------------
+  03 Integrating Tomcat server in CICD pipeline
+  -- install Tomcat
+    ******************************************************************
+    - hosts: tom
+  become: yes
+  vars:
+    - tomcat_version: 9.0.35
+    - tomcat_url: https://downloads.apache.org/tomcat/tomcat-{{tomcat_version.split('.')[0]}}/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz
+  tasks:
+    - name: Install java
+      package:
+        name: java-1.8*
+        state: present
+    - debug:
+        msg: "Tomcat download path is : {{tomcat_url}}"
+    - name: Download tomcat
+      unarchive:
+        src: "{{ tomcat_url}}"
+        dest: /usr/local
+        remote_src: yes
+    - name: Tomcat Path
+      stat:
+        path: /usr/local/apache-tomcat-{{tomcat_version}}
+      register: path_stat
+    - name: Renaming the tomcat
+      command: mv /usr/local/apache-tomcat-{{tomcat_version}} /opt/tomcat
+      when: path_stat.stat.exists
+    - name: Find the context.xml
+      shell: find / -name context.xml
+      register: context_path
+    - debug:
+        msg: "the paths are {{context_path.stdout}}"
+    - name: create a file with above content
+      file:
+        path: /opt/tomcat_context_files
+        state: touch
+    - name: add the above searched files
+      lineinfile:
+        path: /opt/tomcat_context_files
+        line: '{{ item.line}}'
+      with_items:
+        - {line: '{{context_path.stdout}}'}
+    - name: Changing the hostmanager file
+      template:
+        src: hostmanager.xml.j2
+        dest: /opt/tomcat/latest/webapps/host-manager/META-INF/context.xml
+    - name: Changing the manager context file
+      template:
+        src: managercontext.xml.j2
+        dest: /opt/tomcat/latest/webapps/manager/META-INF/context.xml
+    - name: Stopping the tomcat
+      shell: nohup /opt/tomcat/bin/shutdown.sh &
+    - name: Starting the tomcat
+      shell: nohup /opt/tomcat/bin/startup.sh &
+    - name: Changing the port
+      template:
+        src: server.xml.j2
+        dest: /opt/tomcat/conf/server.xml
+    - name: Changing the users in tomcat-users.xml
+      template:
+        src: tomcat-users.xml.j2
+        dest: /opt/tomcat/conf/tomcat-users.xml
+**********************************************************************************
+- class 12
+-- manage jenkins --> available --> deploy to container --> install with out restart
+-- Post-build Actions
+    -- **/*.war
+    -- add deployer user with jenkins
+     - tomcat url
+     - build now
+-- class 13
+  - for automatic builds 
+  - jenkins --> manage plugins --> available --> github integration --> install without restart jenkins --> GitHub project -->
+  - the above may be deprecated
+  - jenkins --> Build Triggers --> GitHub hook trigger for GITScm polling
+  - github --> select the repository --> settings --> webhooks --> <jenkins url/github-webhook/>
+  - once we get every thing is green we are good to go
+                                
+
+    

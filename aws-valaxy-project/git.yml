@@ -1,0 +1,9 @@
+- hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+    - name: install git
+      package:
+        name: git
+        state: present
+    

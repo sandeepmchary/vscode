@@ -1,0 +1,35 @@
+- hosts: localhost
+  connection: local
+  vars:
+    - maven_version: 3.6.3
+    - maven_url: http://www.apache.org/dist/maven/maven-{{maven_version.split('.')[0]}}/{{maven_version}}/binaries/apache-maven-{{maven_version}}-bin.tar.gz
+  become: yes
+  tasks:
+    - debug:
+        var: maven_url
+    - name: Checking if maven is installed or not
+      stat:
+        path: '/opt/apache-maven-{{ maven_version }}'
+      register: maven_installed
+    - name: Download the maven
+      unarchive:
+        src: "{{maven_url}}"
+        dest: /opt
+        remote_src: yes
+    - name: Remove old path configuration
+      file:
+        path: /etc/profile.d/maven.sh
+        state: absent
+    - name: Maven path Configuration
+      lineinfile:
+        dest: /etc/profile.d/maven.sh
+        line: '{{item.line}}'
+        state: present
+        create: yes
+      with_items:
+        - { line: 'M2_HOME=/opt/apache-maven-{{maven_version}}' }
+        - {line: 'PATH=$PATH:$M2_HOME/bin'}
+    - name: Cleaning up
+      file:
+        state: absent
+        path: /opt/apache-maven-{{maven_version}}-bin.tar.gz   

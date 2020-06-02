@@ -1,0 +1,46 @@
+- hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+    - name: Install java
+      package:
+        name: java-1.8*
+        state: present
+    - name: find java path
+      shell: find /usr/lib/jvm/java-1.8* | awk 'NR==3'
+      register: java_path
+    - debug:
+        msg: "Java path is : {{ java_path.stdout}}"
+    - name: Line in file
+      lineinfile:
+        dest: /etc/profile
+        line: '{{ item.line}}'
+      with_items:
+        - {line: 'JAVA_HOME={{java_path.stdout}}'}
+        - {line: 'PATH=$PATH:$JAVA_HOME:$HOME/bin'}
+    - name: Download jenkins.repo
+      get_url:
+        url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+    - name: Import Jenkins Key
+      rpm_key:
+        state: present
+        key: https://jenkins-ci.org/redhat/jenkins-ci.org.key
+    - name: Install Jenkins
+      package:
+        name: jenkins
+        state: present
+    - name: Start and enable jenkins
+      service:
+        name: jenkins
+        enabled: yes
+        state: started
+    - name: Sleep for 30 seconds and continue with play
+      wait_for: timeout=30    
+    - name: Get init password for jenkins
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      changed_when: false
+      register: result
+    - name: print init password
+      debug:
+        var: result.stdout                  

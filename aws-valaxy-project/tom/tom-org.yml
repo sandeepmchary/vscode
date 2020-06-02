@@ -1,0 +1,59 @@
+- hosts: tom
+  become: yes
+  vars:
+    - tomcat_version: 9.0.35
+    - tomcat_url: https://downloads.apache.org/tomcat/tomcat-{{tomcat_version.split('.')[0]}}/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz
+  tasks:
+    - name: Install java
+      package:
+        name: java-1.8*
+        state: present
+    - debug:
+        msg: "Tomcat download path is : {{tomcat_url}}"
+    - name: Download tomcat
+      unarchive:
+        src: "{{ tomcat_url}}"
+        dest: /usr/local
+        remote_src: yes
+    - name: Tomcat Path
+      stat:
+        path: /usr/local/apache-tomcat-{{tomcat_version}}
+      register: path_stat
+    - name: Renaming the tomcat
+      command: mv /usr/local/apache-tomcat-{{tomcat_version}} /opt/tomcat
+      when: path_stat.stat.exists
+    - name: Find the context.xml
+      shell: find / -name context.xml
+      register: context_path
+    - debug:
+        msg: "the paths are {{context_path.stdout}}"
+    - name: create a file with above content
+      file:
+        path: /opt/tomcat_context_files
+        state: touch
+    - name: add the above searched files
+      lineinfile:
+        path: /opt/tomcat_context_files
+        line: '{{ item.line}}'
+      with_items:
+        - {line: '{{context_path.stdout}}'}
+    - name: Changing the hostmanager file
+      template:
+        src: hostmanager.xml.j2
+        dest: /opt/tomcat/latest/webapps/host-manager/META-INF/context.xml
+    - name: Changing the manager context file
+      template:
+        src: managercontext.xml.j2
+        dest: /opt/tomcat/latest/webapps/manager/META-INF/context.xml
+    - name: Stopping the tomcat
+      shell: nohup /opt/tomcat/bin/shutdown.sh &
+    - name: Starting the tomcat
+      shell: nohup /opt/tomcat/bin/startup.sh &
+    - name: Changing the port
+      template:
+        src: server.xml.j2
+        dest: /opt/tomcat/conf/server.xml
+    - name: Changing the users in tomcat-users.xml
+      template:
+        src: tomcat-users.xml.j2
+        dest: /opt/tomcat/conf/tomcat-users.xml                  

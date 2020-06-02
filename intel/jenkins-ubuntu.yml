@@ -1,0 +1,38 @@
+- hosts: ubuntu
+  become: yes
+  tasks:
+    - name: remove java 
+      package:
+        name: "{{ package_name }}"
+        state: absent
+    - name: Install Java
+      package:
+        name: "{{ package_name }}"
+        state: present  
+    - name: find the java path
+      shell: "{{ java_file_path }}"
+      register: java_path
+    - debug:
+        msg: "Java path is : {{java_path.stdout}}" 
+    - name: Line in file
+      lineinfile:
+        dest: /etc/profile
+        line: '{{ item.line }}'
+      with_items:
+        - {line: 'JAVA_HOME={{java_path.stdout}}'}
+        - {line: 'PATH=$PATH:$JAVA_HOME:$HOME/bin'}
+    - name: ensure the jenkins apt repository key is installed
+      apt_key: url=https://pkg.jenkins.io/debian-stable/jenkins.io.key state=present
+    - name: ensure the repository is configured
+      apt_repository: repo='deb https://pkg.jenkins.io/debian-stable binary/' state=present
+    - name: ensure jenkins is installed
+      apt: name=jenkins update_cache=yes
+    - name: ensure jenkins is running
+      service: name=jenkins state=started
+    - name: init password
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      changed_when: false
+      register: result
+    - name: print init password
+      debug:
+        var: result.stdout                

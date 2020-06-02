@@ -1,0 +1,4 @@
+- hosts: logi
+  become: yes
+  tasks:
+    - include: logi.yml
