@@ -1,0 +1,46 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Stop the running container
+      docker_container:
+        name: simple-docker-container
+        state: stopped
+      ignore_errors: yes  
+    - name: Stop the running container
+      docker_container:
+        name: simple-docker-container
+        state: absent
+      ignore_errors: yes
+    - name: Install with pip
+      pip:
+        name:
+          - docker
+          - requests>=2.20.1
+    - name: Build docker images
+      docker_image:
+        build:
+          path: /opt/docker
+        name: simple-docker
+        tag: v3
+        source: build
+    - name: Create simple-docker-container
+      docker_container:
+        name: simple-dockr-container
+        image: simple-docker:v3
+        state: started
+        recreate: yes
+        ports:
+          - "8090:8080"
+    - name: push a image
+      docker_image:
+        name: simple-docker:v3
+        repository: formycore/simple-docker:v3
+        push: yes
+        source: local
+    - name: Remove docker image
+      docker_image:
+        state: absent
+        name: simple-docker
+        tag: v3    
+              
+                         

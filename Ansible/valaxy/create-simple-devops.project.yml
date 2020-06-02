@@ -1,0 +1,48 @@
+- hosts: all
+  become: yes
+  vars:
+    - image_version: "{{ version }}"
+  tasks:
+    - name: Add repository
+      yum_repository:
+        name: epel
+        description: EPEL YUM repo
+        baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    - name: Pip installation 
+      package:
+        name: python-pip
+        state: latest
+    - name: Install with pip
+      pip:
+        name:
+          - docker
+          - requests>=2.20.1
+    - name: Stop the current running container
+      docker_container:
+        name: simple-docker-container
+        state: stopped
+      ignore_errors: yes  
+    - name: Remove stopped container
+      docker_container:
+        name: simple-docker-container
+        state: absent
+      ignore_errors: yes  
+    - name: Remove docker image
+      docker_image:
+        name: simple-devops:{{ image_version }}
+        state: absent
+      ignore_errors: yes  
+    - name: Pull docker image from docker hub
+      docker_image:
+        name: formycore/simple-devops:{{ image_version }}
+        source: pull
+      ignore_errors: yes  
+    - name: Create container using simple-devops-image
+      docker_container:
+        name: simple-devops-container
+        image: formycore/simple-devops:{{ image_version }}
+        state: started
+        recreate: yes
+        ports:
+          - "8080:8080"
+      ignore_errors: yes    

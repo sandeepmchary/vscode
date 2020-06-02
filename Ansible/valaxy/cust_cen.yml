@@ -1,0 +1,7 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Build image
+      docker_image:
+        path: /home/ansadmin/red_geek
+        name: webserver

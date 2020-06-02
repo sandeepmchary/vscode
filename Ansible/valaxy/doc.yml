@@ -1,0 +1,15 @@
+# pip install docker-py
+# rpm -qa | grep -i docker-py
+# pull a centos image
+# create a custom image
+# create a container
+# validate deployment
+---
+- name: Pull the centos image
+  hosts: all
+  become: yes
+  tasks:
+    - name: pull 
+      docker_image:
+        name: centos
+        

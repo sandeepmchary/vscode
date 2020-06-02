@@ -1,0 +1,42 @@
+- hosts: all
+  become: yes
+  vars_files:
+    - secrets.yml
+  tasks:
+    - name: Install with pip
+      pip:
+        name:
+          - docker
+          - requests>=2.20.1
+    - name: Remove the images
+      docker_image:
+        state: absent
+        name: "{{ item }}"
+      with_items:
+        - push-docker:v2
+        - formycore/push-docker:v2
+    - name: Docker login
+      docker_login:
+        username: "{{ docker_hub_username }}"
+        password: "{{ docker_hub_password }}"
+        email: "{{ docker_hub_email }}"
+    - name: Build docker image
+      docker_image:
+        build:
+          path: /opt/docker
+        name: push-docker
+        tag: v2
+        source: build
+      ignore_errors: yes
+    - name: Create a tag to image
+      command: docker tag push-docker:v2 formycore/push-docker:v2
+    - name: push the image to docker hub
+      command: docker push formycore/push-docker:v2  
+    - name: remove docker from local
+      docker_image:
+        state: absent
+        name: formycore/push-docker
+        tag: v2
+      ignore_errors: yes
+    - name: docker logout
+      command: docker logout               

@@ -1,0 +1,33 @@
+- hosts: all
+  become: yes
+  vars_files:
+    - secrets.yml
+  tasks:
+    - name: Docker login
+      docker_login:
+        username: "{{ docker_hub_username }}"
+        password: "{{ docker_hub_password }}"
+        email: "{{ docker_hub_email }}"
+    - name: Stop the running container
+      docker_container:
+        name: simple-docker-container
+        state: stopped
+      ignore_errors: yes
+    - name: remove stopped container
+      docker_container:
+        name: simple-docker-container
+        state: absent
+      ignore_errors: yes  
+    - name: Pull docker image
+      docker_image:
+        name: formycore/push-docker:v1
+        source: pull
+    - name: Create a container 
+      docker_container:
+        name: simple-docker-container
+        image: formycore/push-docker:v1
+        state: started
+        recreate: yes
+        ports:
+          - "8090:8080"                   
+        

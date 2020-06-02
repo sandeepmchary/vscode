@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DOM Location hostname Property</title>
+    <style>
+        h1 {
+            color: green;
+        }
+
+        h2 {
+            font-family: Impact;
+        }
+
+        body {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>SAMANTHA</h1>
+    <h2>hostname Property</h2>
+    <p>
+      For returning the hostname of the current
+      URL, double click the "Return hostname" button:
+    </p>
+    <button ondblclick="myhost()">
+      Return hostname
+    </button>
+    <p id="hostname"></p>
+    <script>
+        function myhost() {
+            var h = location.hostname;
+            document.getElementById("hostname").innerHTML = h;
+        }
+    </script>
+</body>
+
+</html>

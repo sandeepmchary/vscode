@@ -1,0 +1,21 @@
+- hosts: all
+  become: yes
+  vars:
+    - required_java: java-1.8.0-openjdk-devel
+    - set_java: jre-1.8.0-openjdk 
+  tasks:
+    - name: Install Java
+      package:
+        name: java-1.8.0-openjdk-devel
+        state: present
+    - name: Setting java
+      alternatives:
+        name: java
+        link: /usr/bin/java
+        path: /usr/lib/jvm/{{ set_java }}/bin/java
+    - name: Find the java path
+      find:
+        path: /usr/lib/jvm/java-1.8*
+      register: java_path
+    - debug:
+        var: java_path.head -n 3    

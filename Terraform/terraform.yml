@@ -1,0 +1,31 @@
+- name: Install Terraform
+  hosts: ter
+  vars:
+    terra_ver: 0.12.25
+    terra_url: https://releases.hashicorp.com/terraform/{{terra_ver}}/terraform_{{ terra_ver}}_linux_amd64.zip
+  become: yes
+  tasks:
+    - name: Install packages
+      package:
+        update_cache: yes
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - wget
+        - unzip
+    - name: check whether the terraform is downloaded or not
+      stat:
+        path: /opt/terraform
+      register: terra_installed
+    - name: Download the terraform 
+      unarchive:
+        src: "{{ terra_url }}"
+        dest: /opt
+        remote_src: yes
+    - name: checking the path
+      command: mv /opt/terraform /usr/local/bin/
+      when: terra_installed.stat.exists    
+
+      
+        
+

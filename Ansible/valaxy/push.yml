@@ -1,0 +1,23 @@
+- hosts: all
+  become: yes
+  vars_files:
+    - secrets.yml
+  tasks:
+    - name: Docker login
+      docker_login:
+        username: "{{ docker_hub_username }}"
+        password: "{{ docker_hub_password }}"
+        email: "{{ docker_hub_email }}"
+    - name: Build docker image
+      docker_image:
+        build:
+          path: /opt/docker
+        name: push-docker
+        tag: v3
+        source: build
+    - name: push a image
+      docker_image:
+        name: push-docker:v3
+        repository: formycore/push-docker:v3
+        push: yes
+        source: local

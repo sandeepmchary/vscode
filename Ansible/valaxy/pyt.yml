@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install with pip
+      pip:
+        name: 
+          - docker
+          - requests>=2.20.1
+    - name: Building docker image
+      docker_image:
+        build:
+          path: /opt/docker
+        name: simple-docker
+        tag: v1
+        source: build
+    - name: Create simple-docker-container
+      docker_container:
+        name: simple-docker-container
+        image: simple-docker:v1
+        state: present
+        recreate: yes
+        ports:
+          - "8080:8080"    

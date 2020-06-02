@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="7303f904-2865-4f7c-8f0e-c0ae350bcda4" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1cJ2Fx8QKaTWHoUJI7bLhDOYyQG" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.fileTypes" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7303f904-2865-4f7c-8f0e-c0ae350bcda4" name="Default Changelist" comment="" />
+      <created>1590232276109</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1590232276109</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.yml" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="264" y="148" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1590232366055">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="264" y="148" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1366.728@0.0.1366.728" timestamp="1590232366055" />
+    <state x="97" y="0" key="SettingsEditor" timestamp="1590233042198">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="97" y="0" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1590233042198" />
+  </component>
+</project>
